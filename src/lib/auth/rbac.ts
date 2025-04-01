@@ -3,6 +3,7 @@ import { cookies } from 'next/headers'
 import { redirect } from 'next/navigation'
 import React from 'react'
 
+// roles can be user, admin, editor, etc.
 export type Role = 'user' | 'admin' | 'editor'
 
 export async function checkRole(requiredRole: Role) {
