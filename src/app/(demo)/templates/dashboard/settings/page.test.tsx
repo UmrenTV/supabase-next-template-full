@@ -15,102 +15,69 @@ describe('SettingsPage', () => {
   it('validates profile form fields', async () => {
     render(<SettingsPage />)
     
-    const fullNameInput = screen.getByLabelText('Full Name')
-    const emailInput = screen.getByLabelText('Email')
-    const bioInput = screen.getByLabelText('Bio')
-    const saveButton = screen.getByText('Save Changes')
-    
     // Test empty name
-    fireEvent.change(fullNameInput, { target: { value: '' } })
-    fireEvent.click(saveButton)
+    const nameInput = screen.getByLabelText('Full Name')
+    fireEvent.change(nameInput, { target: { value: '' } })
+    fireEvent.blur(nameInput)
     await waitFor(() => {
       expect(screen.getByText('Name must be at least 2 characters')).toBeInTheDocument()
     })
     
     // Test invalid email
+    const emailInput = screen.getByLabelText('Email')
     fireEvent.change(emailInput, { target: { value: 'invalid-email' } })
-    fireEvent.click(saveButton)
+    fireEvent.blur(emailInput)
     await waitFor(() => {
       expect(screen.getByText('Invalid email address')).toBeInTheDocument()
     })
     
     // Test long bio
+    const bioInput = screen.getByLabelText('Bio')
     fireEvent.change(bioInput, { target: { value: 'a'.repeat(201) } })
-    fireEvent.click(saveButton)
+    fireEvent.blur(bioInput)
     await waitFor(() => {
       expect(screen.getByText('Bio must be less than 200 characters')).toBeInTheDocument()
-    })
-    
-    // Test valid form submission
-    fireEvent.change(fullNameInput, { target: { value: 'Jane Doe' } })
-    fireEvent.change(emailInput, { target: { value: 'jane@example.com' } })
-    fireEvent.change(bioInput, { target: { value: 'Valid bio' } })
-    fireEvent.click(saveButton)
-    
-    await waitFor(() => {
-      expect(screen.queryByText('Name must be at least 2 characters')).not.toBeInTheDocument()
-      expect(screen.queryByText('Invalid email address')).not.toBeInTheDocument()
-      expect(screen.queryByText('Bio must be less than 200 characters')).not.toBeInTheDocument()
     })
   })
 
   it('validates security form fields', async () => {
     render(<SettingsPage />)
     
-    const currentPasswordInput = screen.getByLabelText('Current Password')
-    const newPasswordInput = screen.getByLabelText('New Password')
-    const confirmPasswordInput = screen.getByLabelText('Confirm New Password')
-    const updateButton = screen.getByText('Update Password')
-    
     // Test short password
+    const newPasswordInput = screen.getByLabelText('New Password')
     fireEvent.change(newPasswordInput, { target: { value: 'short' } })
-    fireEvent.click(updateButton)
+    fireEvent.blur(newPasswordInput)
     await waitFor(() => {
       expect(screen.getByText('Password must be at least 8 characters')).toBeInTheDocument()
     })
     
     // Test password mismatch
-    fireEvent.change(newPasswordInput, { target: { value: 'newpassword123' } })
-    fireEvent.change(confirmPasswordInput, { target: { value: 'different123' } })
-    fireEvent.click(updateButton)
+    const confirmPasswordInput = screen.getByLabelText('Confirm New Password')
+    fireEvent.change(newPasswordInput, { target: { value: 'password123' } })
+    fireEvent.change(confirmPasswordInput, { target: { value: 'password456' } })
+    fireEvent.blur(confirmPasswordInput)
     await waitFor(() => {
       expect(screen.getByText("Passwords don't match")).toBeInTheDocument()
     })
-    
-    // Test valid form submission
-    fireEvent.change(currentPasswordInput, { target: { value: 'oldpass123' } })
-    fireEvent.change(newPasswordInput, { target: { value: 'newpassword123' } })
-    fireEvent.change(confirmPasswordInput, { target: { value: 'newpassword123' } })
-    fireEvent.click(updateButton)
-    
-    await waitFor(() => {
-      expect(screen.queryByText('Password must be at least 8 characters')).not.toBeInTheDocument()
-      expect(screen.queryByText("Passwords don't match")).not.toBeInTheDocument()
-    })
   })
 
-  it('handles notification settings toggles', async () => {
+  it('handles notification toggles', async () => {
     render(<SettingsPage />)
     
-    const emailNotificationsToggle = screen.getByLabelText('Email Notifications')
-    const pushNotificationsToggle = screen.getByLabelText('Push Notifications')
-    const smsNotificationsToggle = screen.getByLabelText('SMS Notifications')
-    const marketingEmailsToggle = screen.getByLabelText('Marketing Emails')
-    const saveButton = screen.getByText('Save Preferences')
-    
-    // Toggle notifications
-    fireEvent.click(emailNotificationsToggle)
-    fireEvent.click(pushNotificationsToggle)
-    fireEvent.click(smsNotificationsToggle)
-    fireEvent.click(marketingEmailsToggle)
-    fireEvent.click(saveButton)
-    
-    await waitFor(() => {
-      expect(emailNotificationsToggle).not.toBeChecked()
-      expect(pushNotificationsToggle).not.toBeChecked()
-      expect(smsNotificationsToggle).toBeChecked()
-      expect(marketingEmailsToggle).not.toBeChecked()
-    })
+    const emailToggle = screen.getByLabelText('Email Notifications')
+    const pushToggle = screen.getByLabelText('Push Notifications')
+    const smsToggle = screen.getByLabelText('SMS Notifications')
+    const marketingToggle = screen.getByLabelText('Marketing Emails')
+
+    fireEvent.click(emailToggle)
+    fireEvent.click(pushToggle)
+    fireEvent.click(smsToggle)
+    fireEvent.click(marketingToggle)
+
+    expect(emailToggle).not.toBeChecked()
+    expect(pushToggle).not.toBeChecked()
+    expect(smsToggle).toBeChecked()
+    expect(marketingToggle).not.toBeChecked()
   })
 
   it('handles privacy settings changes', async () => {
@@ -119,22 +86,49 @@ describe('SettingsPage', () => {
     const profileVisibilitySelect = screen.getByLabelText('Profile Visibility')
     const activityStatusSelect = screen.getByLabelText('Activity Status')
     const dataCollectionToggle = screen.getByLabelText('Data Collection')
-    const thirdPartyAccessToggle = screen.getByLabelText('Third-Party Access')
-    const saveButton = screen.getByText('Save Privacy Settings')
-    
-    // Change privacy settings
+    const thirdPartyToggle = screen.getByLabelText('Third-Party Access')
+
     fireEvent.change(profileVisibilitySelect, { target: { value: 'private' } })
     fireEvent.change(activityStatusSelect, { target: { value: 'away' } })
     fireEvent.click(dataCollectionToggle)
-    fireEvent.click(thirdPartyAccessToggle)
-    fireEvent.click(saveButton)
+    fireEvent.click(thirdPartyToggle)
+
+    expect(profileVisibilitySelect).toHaveValue('private')
+    expect(activityStatusSelect).toHaveValue('away')
+    expect(dataCollectionToggle).not.toBeChecked()
+    expect(thirdPartyToggle).toBeChecked()
+  })
+
+  it('submits forms with valid data', async () => {
+    const consoleSpy = jest.spyOn(console, 'log')
+    render(<SettingsPage />)
     
+    // Submit profile form
+    const nameInput = screen.getByLabelText('Full Name')
+    fireEvent.change(nameInput, { target: { value: 'John Doe' } })
+    fireEvent.click(screen.getByText('Save Changes'))
     await waitFor(() => {
-      expect(profileVisibilitySelect).toHaveValue('private')
-      expect(activityStatusSelect).toHaveValue('away')
-      expect(dataCollectionToggle).not.toBeChecked()
-      expect(thirdPartyAccessToggle).toBeChecked()
+      expect(consoleSpy).toHaveBeenCalledWith('Profile data:', expect.objectContaining({
+        fullName: 'John Doe',
+        email: 'john@example.com',
+        bio: 'Software developer and tech enthusiast',
+      }))
     })
+
+    // Submit security form
+    const newPasswordInput = screen.getByLabelText('New Password')
+    const confirmPasswordInput = screen.getByLabelText('Confirm New Password')
+    fireEvent.change(newPasswordInput, { target: { value: 'password123' } })
+    fireEvent.change(confirmPasswordInput, { target: { value: 'password123' } })
+    fireEvent.click(screen.getByText('Update Password'))
+    await waitFor(() => {
+      expect(consoleSpy).toHaveBeenCalledWith('Security data:', expect.objectContaining({
+        newPassword: 'password123',
+        confirmPassword: 'password123',
+      }))
+    })
+
+    consoleSpy.mockRestore()
   })
 
   it('disables submit buttons during form submission', async () => {

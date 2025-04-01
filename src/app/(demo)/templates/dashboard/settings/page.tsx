@@ -16,37 +16,20 @@ import {
   FaMobileAlt, 
   FaUserFriends, 
   FaChartLine, 
-  FaCog 
+  FaCog,
+  FaSpinner
 } from 'react-icons/fa'
-
-const profileSchema = z.object({
-  fullName: z.string().min(2, 'Name must be at least 2 characters'),
-  email: z.string().email('Invalid email address'),
-  bio: z.string().max(200, 'Bio must be less than 200 characters'),
-})
-
-const securitySchema = z.object({
-  currentPassword: z.string().min(8, 'Password must be at least 8 characters'),
-  newPassword: z.string().min(8, 'Password must be at least 8 characters'),
-  confirmPassword: z.string()
-}).refine((data) => data.newPassword === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
-})
-
-const notificationSchema = z.object({
-  emailNotifications: z.boolean(),
-  pushNotifications: z.boolean(),
-  smsNotifications: z.boolean(),
-  marketingEmails: z.boolean(),
-})
-
-const privacySchema = z.object({
-  profileVisibility: z.enum(['public', 'private', 'friends']),
-  activityStatus: z.enum(['online', 'away', 'offline']),
-  dataCollection: z.boolean(),
-  thirdPartyAccess: z.boolean(),
-})
+import { 
+  profileSchema, 
+  securitySchema, 
+  notificationSchema, 
+  privacySchema,
+  updateProfile,
+  updateSecurity,
+  updateNotifications,
+  updatePrivacy
+} from './actions'
+import { toast } from 'react-hot-toast'
 
 type ProfileFormData = z.infer<typeof profileSchema>
 type SecurityFormData = z.infer<typeof securitySchema>
@@ -55,29 +38,19 @@ type PrivacyFormData = z.infer<typeof privacySchema>
 
 export default function SettingsPage() {
   const [profilePhoto, setProfilePhoto] = useState<string | null>(null)
-  const [formData, setFormData] = useState({
-    fullName: 'John Doe',
-    email: 'john@example.com',
-    bio: 'Software Developer',
-    currentPassword: '',
-    newPassword: '',
-    confirmPassword: '',
-    emailNotifications: true,
-    pushNotifications: true,
-    smsNotifications: false,
-    marketingEmails: true,
-    profileVisibility: 'public',
-    activityStatus: 'online',
-    dataCollection: true,
-    thirdPartyAccess: false
+  const [isSubmitting, setIsSubmitting] = useState({
+    profile: false,
+    security: false,
+    notifications: false,
+    privacy: false
   })
 
   const profileForm = useForm<ProfileFormData>({
     resolver: zodResolver(profileSchema),
     defaultValues: {
-      fullName: formData.fullName,
-      email: formData.email,
-      bio: formData.bio,
+      fullName: 'John Doe',
+      email: 'john@example.com',
+      bio: 'Software Developer',
     }
   })
 
@@ -93,20 +66,20 @@ export default function SettingsPage() {
   const notificationForm = useForm<NotificationFormData>({
     resolver: zodResolver(notificationSchema),
     defaultValues: {
-      emailNotifications: formData.emailNotifications,
-      pushNotifications: formData.pushNotifications,
-      smsNotifications: formData.smsNotifications,
-      marketingEmails: formData.marketingEmails,
+      emailNotifications: true,
+      pushNotifications: true,
+      smsNotifications: false,
+      marketingEmails: true,
     }
   })
 
   const privacyForm = useForm<PrivacyFormData>({
     resolver: zodResolver(privacySchema),
     defaultValues: {
-      profileVisibility: formData.profileVisibility as 'public' | 'private' | 'friends',
-      activityStatus: formData.activityStatus as 'online' | 'away' | 'offline',
-      dataCollection: formData.dataCollection,
-      thirdPartyAccess: formData.thirdPartyAccess,
+      profileVisibility: 'public',
+      activityStatus: 'online',
+      dataCollection: true,
+      thirdPartyAccess: false,
     }
   })
 
@@ -118,28 +91,69 @@ export default function SettingsPage() {
     reader.readAsDataURL(file)
   }
 
-  const onProfileSubmit = (data: ProfileFormData) => {
-    setFormData(prev => ({ ...prev, ...data }))
-    // Handle API call here
-    console.log('Profile updated:', data)
+  const onProfileSubmit = async (data: ProfileFormData) => {
+    try {
+      setIsSubmitting(prev => ({ ...prev, profile: true }))
+      const result = await updateProfile('user123', data)
+      if (result.success) {
+        toast.success('Profile updated successfully')
+      } else {
+        toast.error(result.error || 'Failed to update profile')
+      }
+    } catch (error) {
+      toast.error('An unexpected error occurred')
+    } finally {
+      setIsSubmitting(prev => ({ ...prev, profile: false }))
+    }
   }
 
-  const onSecuritySubmit = (data: SecurityFormData) => {
-    // Handle API call here
-    console.log('Security updated:', data)
-    securityForm.reset()
+  const onSecuritySubmit = async (data: SecurityFormData) => {
+    try {
+      setIsSubmitting(prev => ({ ...prev, security: true }))
+      const result = await updateSecurity('user123', data)
+      if (result.success) {
+        toast.success('Security settings updated successfully')
+        securityForm.reset()
+      } else {
+        toast.error(result.error || 'Failed to update security settings')
+      }
+    } catch (error) {
+      toast.error('An unexpected error occurred')
+    } finally {
+      setIsSubmitting(prev => ({ ...prev, security: false }))
+    }
   }
 
-  const onNotificationSubmit = (data: NotificationFormData) => {
-    setFormData(prev => ({ ...prev, ...data }))
-    // Handle API call here
-    console.log('Notifications updated:', data)
+  const onNotificationSubmit = async (data: NotificationFormData) => {
+    try {
+      setIsSubmitting(prev => ({ ...prev, notifications: true }))
+      const result = await updateNotifications('user123', data)
+      if (result.success) {
+        toast.success('Notification preferences updated successfully')
+      } else {
+        toast.error(result.error || 'Failed to update notification preferences')
+      }
+    } catch (error) {
+      toast.error('An unexpected error occurred')
+    } finally {
+      setIsSubmitting(prev => ({ ...prev, notifications: false }))
+    }
   }
 
-  const onPrivacySubmit = (data: PrivacyFormData) => {
-    setFormData(prev => ({ ...prev, ...data }))
-    // Handle API call here
-    console.log('Privacy updated:', data)
+  const onPrivacySubmit = async (data: PrivacyFormData) => {
+    try {
+      setIsSubmitting(prev => ({ ...prev, privacy: true }))
+      const result = await updatePrivacy('user123', data)
+      if (result.success) {
+        toast.success('Privacy settings updated successfully')
+      } else {
+        toast.error(result.error || 'Failed to update privacy settings')
+      }
+    } catch (error) {
+      toast.error('An unexpected error occurred')
+    } finally {
+      setIsSubmitting(prev => ({ ...prev, privacy: false }))
+    }
   }
 
   return (
@@ -158,7 +172,7 @@ export default function SettingsPage() {
                   currentPhoto={profilePhoto}
                   onPhotoChange={handlePhotoChange}
                   className="w-32 h-32"
-                  name={formData.fullName}
+                  name={profileForm.getValues('fullName')}
                 />
               </div>
               <div className="form-control">
@@ -214,10 +228,19 @@ export default function SettingsPage() {
               <button 
                 type="submit" 
                 className="btn btn-primary w-full"
-                disabled={profileForm.formState.isSubmitting}
+                disabled={isSubmitting.profile}
               >
-                <FaSave className="mr-2" />
-                {profileForm.formState.isSubmitting ? 'Saving...' : 'Save Changes'}
+                {isSubmitting.profile ? (
+                  <>
+                    <FaSpinner className="mr-2 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <FaSave className="mr-2" />
+                    Save Changes
+                  </>
+                )}
               </button>
             </form>
           </div>
@@ -285,10 +308,19 @@ export default function SettingsPage() {
               <button 
                 type="submit" 
                 className="btn btn-primary w-full"
-                disabled={securityForm.formState.isSubmitting}
+                disabled={isSubmitting.security}
               >
-                <FaSave className="mr-2" />
-                {securityForm.formState.isSubmitting ? 'Updating...' : 'Update Password'}
+                {isSubmitting.security ? (
+                  <>
+                    <FaSpinner className="mr-2 animate-spin" />
+                    Updating...
+                  </>
+                ) : (
+                  <>
+                    <FaSave className="mr-2" />
+                    Update Password
+                  </>
+                )}
               </button>
             </form>
           </div>
@@ -357,10 +389,19 @@ export default function SettingsPage() {
               <button 
                 type="submit" 
                 className="btn btn-primary w-full"
-                disabled={notificationForm.formState.isSubmitting}
+                disabled={isSubmitting.notifications}
               >
-                <FaSave className="mr-2" />
-                {notificationForm.formState.isSubmitting ? 'Saving...' : 'Save Preferences'}
+                {isSubmitting.notifications ? (
+                  <>
+                    <FaSpinner className="mr-2 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <FaSave className="mr-2" />
+                    Save Preferences
+                  </>
+                )}
               </button>
             </form>
           </div>
@@ -403,8 +444,8 @@ export default function SettingsPage() {
                   className={`select select-bordered ${privacyForm.formState.errors.activityStatus ? 'select-error' : ''}`}
                 >
                   <option value="online">Online</option>
-                  <option value="away">Away</option>
                   <option value="offline">Offline</option>
+                  <option value="away">Away</option>
                 </select>
                 {privacyForm.formState.errors.activityStatus && (
                   <label className="label">
@@ -443,10 +484,19 @@ export default function SettingsPage() {
               <button 
                 type="submit" 
                 className="btn btn-primary w-full"
-                disabled={privacyForm.formState.isSubmitting}
+                disabled={isSubmitting.privacy}
               >
-                <FaSave className="mr-2" />
-                {privacyForm.formState.isSubmitting ? 'Saving...' : 'Save Privacy Settings'}
+                {isSubmitting.privacy ? (
+                  <>
+                    <FaSpinner className="mr-2 animate-spin" />
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <FaSave className="mr-2" />
+                    Save Privacy Settings
+                  </>
+                )}
               </button>
             </form>
           </div>
