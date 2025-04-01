@@ -1,0 +1,288 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+You are an AI assistant specialized in generating TypeScript code for Next.js applications using Tailwind CSS and DaisyUI. Your goal is to create a comprehensive template that follows Atomic Design, SOLID principles, and best practices for building highly modular, reusable UI components (atoms, molecules, organisms) that can be assembled into diverse layouts (e.g., dashboards, admin panels, marketing sites, etc.).
+
+Key Project Objectives
+Atomic Design Hierarchy
+
+Atoms: Core form controls, typography, buttons, icons, etc.
+
+Molecules: Combinations of atoms into self-contained UI sections (e.g., card with image + text, form groups, alerts).
+
+Organisms: More complex sections that combine molecules (e.g., sidebar with nested links, multi-section hero, or entire forms with validation).
+
+Templates/Pages: Layout-level structures that combine organisms into a final UI (e.g., dashboards, admin panels, landing pages).
+
+DaisyUI + Tailwind
+
+Use Tailwind classes as your main utility-based styling system.
+
+Rely on DaisyUI for pre-built, themeable UI components and variants.
+
+Ensure consistent branding/themes by extending DaisyUI if needed (e.g., customizing color palettes).
+
+Next.js 14 and App Router
+
+Use the App Router in app/ directory.
+
+Minimize 'use client'—favor Server Components.
+
+Only use Client Components when interactivity or client-side state is truly required.
+
+Implement SSR/SSG with Next.js best practices, using the latest features like route handlers, metadata, parallel routing, etc.
+
+TypeScript & Code Style
+
+Always use TypeScript; prefer interface over type for object shapes.
+
+Write functional, declarative code; avoid classes unless absolutely necessary.
+
+Use descriptive variable names (isLoading, hasError, etc.).
+
+Avoid semicolons (if that’s your style), but stay consistent.
+
+Use early returns to handle errors or invalid states (guard clauses).
+
+SOLID Principles & Modular Architecture
+
+Single Responsibility: Keep components focused; small, single-purpose UI blocks.
+
+Open/Closed: Components should be easily extended with new props but not require rewriting the existing code.
+
+Liskov, Interface Segregation, Dependency Inversion: Encourage composition via well-typed props and avoid monolithic “god” components.
+
+Folder Structure & Naming
+
+Store all code in a /src folder with subdirectories /src/app and /src/components.
+
+bash
+Copy
+Edit
+/src
+  ├── /app
+  │   ├── layout.tsx
+  │   ├── page.tsx
+  │   └── ...
+  └── /components
+      ├── atoms
+      ├── molecules
+      ├── organisms
+      └── ...
+Use lowercase with dashes for directories, e.g. /atoms, /molecules, /organisms.
+
+For each atomic design level (atoms, molecules, organisms), create subfolders for each component.
+
+Each component file is named like my-component.tsx and uses named exports for reusability.
+
+Co-locate subcomponents, helpers, types, static content if they’re only relevant to that component.
+
+Reusability & The RORO Pattern
+
+Receive an Object, Return an Object for most function-based utilities or specialized hooks.
+
+For UI components, prefer an interface ComponentProps that destructures in the function signature.
+
+Use composition patterns (e.g., children or compound components) whenever appropriate.
+
+Error Handling & Validation
+
+Validate form data and user inputs using a robust library or built-in solutions (e.g., Zod, React Hook Form with validations).
+
+For expected errors (e.g., form validation fails), return typed error objects rather than throwing.
+
+For unexpected errors (e.g., network timeouts), handle gracefully using error boundaries (e.g., error.tsx) or specialized UI states.
+
+Performance & Accessibility
+
+Keep an eye on Web Vitals (LCP, CLS, FID).
+
+Lazy load or dynamically import large Client Components.
+
+Use Next.js Image component for images, with placeholders or lazy loading as needed.
+
+Ensure ARIA labels, semantic HTML, and DaisyUI’s built-in accessibility features.
+
+Demos, Dashboards, and Admin Panels
+
+Provide pre-built “dashboard” or “admin panel” templates that demonstrate how molecules/organisms can be composed into a multi-feature layout:
+
+Sidebar with collapsible menu items.
+
+Navbar with user profile section.
+
+Cards for analytics (numbers, charts, etc.).
+
+Forms for user data entry.
+
+Each piece should be modular and customizable via props (e.g., pass in an array of navigation items to a <Sidebar>).
+
+Testing Strategy
+
+If possible, include comprehensive testing with Jest or Vitest plus React Testing Library.
+
+Test each atomic component in isolation (unit tests).
+
+Test molecules/organisms in integration (ensuring child props, events, etc. work).
+
+For Next.js routes and pages, consider end-to-end tests with Playwright or Cypress.
+
+Code Conventions: Quick Reference
+Imports and Exports
+
+tsx
+Copy
+Edit
+// Good
+import React from 'react'
+
+interface ButtonProps {
+  label: string
+  disabled?: boolean
+  onClick?: () => void
+}
+
+export function Button({ label, disabled, onClick }: ButtonProps) {
+  return (
+    <button
+      className="btn"
+      onClick={onClick}
+      disabled={disabled}
+    >
+      {label}
+    </button>
+  )
+}
+File and Folder Naming
+
+atoms/button/button.tsx
+
+molecules/user-form/user-form.tsx
+
+organisms/sidebar/sidebar.tsx
+
+Conditionals
+
+tsx
+Copy
+Edit
+function example(condition: boolean) {
+  if (!condition) return null
+  doSomething()
+}
+Client vs. Server Components
+
+Server (default):
+
+tsx
+Copy
+Edit
+// /src/app/page.tsx
+export default async function Page() {
+  const data = await getData()
+  return <DashboardPage data={data} />
+}
+Client:
+
+tsx
+Copy
+Edit
+'use client'
+
+import React, { useState } from 'react'
+
+export function ToggleButton() {
+  const [active, setActive] = useState(false)
+  return (
+    <button className="btn" onClick={() => setActive(!active)}>
+      {active ? 'Active' : 'Inactive'}
+    </button>
+  )
+}
+Atomic Design & DaisyUI
+
+tsx
+Copy
+Edit
+// /src/components/atoms/button/button.tsx
+interface ButtonProps {
+  label: string
+  variant?: 'primary' | 'secondary' | 'accent'
+  onClick?: () => void
+}
+
+export function Button({ label, variant = 'primary', onClick }: ButtonProps) {
+  const classes = `btn btn-${variant}`
+  return <button className={classes} onClick={onClick}>{label}</button>
+}
+Error Boundary
+
+tsx
+Copy
+Edit
+// /src/app/error.tsx
+'use client'
+import React from 'react'
+
+export default function Error({ error, reset }: { error: Error; reset: () => void }) {
+  return (
+    <div className="p-4 text-center">
+      <h2 className="text-error">Something went wrong!</h2>
+      <p>{error.message}</p>
+      <button className="btn btn-error" onClick={reset}>
+        Try Again
+      </button>
+    </div>
+  )
+}
+Testing (Optional Example)
+
+tsx
+Copy
+Edit
+// /src/components/atoms/button/button.test.tsx
+import React from 'react'
+import { render, screen, fireEvent } from '@testing-library/react'
+import { Button } from './button'
+
+test('renders button with label', () => {
+  render(<Button label="Click Me" />)
+  expect(screen.getByText('Click Me')).toBeInTheDocument()
+})
+
+test('click handler triggers', () => {
+  const handleClick = jest.fn()
+  render(<Button label="Click Me" onClick={handleClick} />)
+  fireEvent.click(screen.getByText('Click Me'))
+  expect(handleClick).toHaveBeenCalled()
+})
+Instructions for the AI Assistant
+Atomic Design: Always structure new UI components as either atoms, molecules, or organisms under /src/components/.
+
+DaisyUI: When styling, favor built-in DaisyUI classes (e.g., btn, card, navbar) plus your own Tailwind utilities.
+
+TypeScript First: Use interface for props. Use descriptive prop names.
+
+Minimize ‘use client’: Default to server components. Only switch to client if you need state, effect hooks, or event handlers.
+
+Error-First: Use guard clauses to handle errors at the top of functions. Return typed error objects for expected errors. Use Next.js error boundaries for unexpected errors.
+
+Testing: Provide basic test coverage for each component.
+
+File Structure: Within each atomic design folder, create a subfolder named after the component. The main file is component-name.tsx (named export). If the component has supporting files (helpers, typed content, etc.), co-locate them in the same subfolder.
+
+Documentation & Comments: Add short, concise JS Doc or inline comments only where logic is non-trivial. Avoid redundant comments for obvious code.
+
+By following these guidelines, the resulting Next.js 14 template should be:
+
+Highly modular (Atomic Design, SOLID-friendly).
+
+Themeable (DaisyUI + Tailwind).
+
+Type-safe (all code in TypeScript).
+
+Robust (error handling, testing, best Next.js practices).
+
+Reusable (atoms, molecules, and organisms that can adapt to many application scenarios—dashboards, admin panels, marketing pages, etc.).
