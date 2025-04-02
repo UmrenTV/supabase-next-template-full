@@ -1,151 +1,175 @@
-'use client'
+"use client";
 
-import { useState } from 'react'
-import Link from 'next/link'
-import { usePathname } from 'next/navigation'
-import { FaBars, FaTimes, FaSignInAlt, FaSignOutAlt } from 'react-icons/fa'
-import { useAuth } from '@/lib/auth/auth-context'
+import { useState } from "react";
+import Link from "next/link";
+import { usePathname, useRouter } from "next/navigation";
+import { FaBars, FaTimes, FaSignInAlt, FaSignOutAlt } from "react-icons/fa";
+import { useAuth } from "@/lib/auth/auth-context";
+import { isProtectedRoute } from "@/lib/auth/route-protection";
+import { ThemeSwitcher } from "@/components/atoms/theme-switcher/theme-switcher";
 
 interface NavItem {
-  href: string
-  label: string
-  icon: React.ReactNode
+  href: string;
+  label: string;
+  icon: React.ReactNode;
 }
 
 interface SidebarProps {
-  title: string
-  navItems: NavItem[]
-  isOpen?: boolean
-  onToggle?: () => void
+  title: string;
+  navItems: NavItem[];
+  isOpen?: boolean;
+  onToggle?: () => void;
 }
 
-export function Sidebar({ title, navItems, isOpen = false, onToggle }: SidebarProps) {
-  const pathname = usePathname()
-  const { user, logout } = useAuth()
+export function Sidebar({
+  title,
+  navItems,
+  isOpen = false,
+  onToggle,
+}: SidebarProps) {
+  const pathname = usePathname();
+  const router = useRouter();
+  const { user, logout } = useAuth();
 
   const handleLogout = async () => {
     try {
-      await logout()
+      const currentPath = pathname;
+      await logout();
+
+      // If we're on a protected route, redirect to login with redirectTo
+      if (isProtectedRoute(currentPath)) {
+        router.push(
+          `/auth/login?redirectTo=${encodeURIComponent(currentPath)}`
+        );
+      }
+      // Otherwise, we stay on the current page and the UI will update automatically
+      // due to the user state change
     } catch (error) {
-      console.error('Failed to logout:', error)
+      console.error("Failed to logout:", error);
     }
-  }
+  };
+
+  const handleLogin = () => {
+    // Add current path as redirectTo parameter
+    router.push(`/auth/login?redirectTo=${encodeURIComponent(pathname)}`);
+  };
+
+  const handleNavClick = (
+    e: React.MouseEvent<HTMLAnchorElement>,
+    href: string
+  ) => {
+    // If it's a hash link, handle smooth scrolling
+    if (href.startsWith("#")) {
+      e.preventDefault();
+      const element = document.querySelector(href);
+      if (element) {
+        element.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  };
+
+  const commonLinkClasses = `
+    flex items-center px-3 py-2 rounded-lg transition-all duration-300 w-full
+    ${!isOpen ? "justify-center" : ""}
+  `;
 
   return (
     <>
-      <aside 
+      <aside
         className={`
           fixed top-0 left-0 h-screen bg-[#1B1E23] border-r border-gray-800
-          transition-all duration-300 ease-in-out z-30
-          ${isOpen ? 'w-64' : 'w-16'}
+          transition-all duration-300 ease-in-out z-30 flex flex-col
+          ${isOpen ? "w-64" : "w-16"}
         `}
       >
         {/* Sidebar Header with Toggle Button */}
         <div className="h-16 flex items-center px-4 border-b border-gray-800">
           <div className="flex items-center justify-between w-full">
-            <h1 
+            <h1
               className={`
                 text-xl font-semibold transition-opacity duration-300
-                ${isOpen ? 'opacity-100 w-auto' : 'opacity-0 w-0 overflow-hidden'}
+                ${
+                  isOpen
+                    ? "opacity-100 w-auto"
+                    : "opacity-0 w-0 overflow-hidden"
+                }
               `}
             >
               {title}
             </h1>
-            <button 
-              onClick={onToggle}
-              className="p-2 bg-[#6C5DD3] rounded-full text-white hover:bg-[#5a4dbb] transition-colors min-w-[32px]"
-            >
-              {isOpen ? <FaTimes size={14} /> : <FaBars size={14} />}
+            <button onClick={onToggle} className="btn btn-ghost btn-circle">
+              {isOpen ? <FaTimes /> : <FaBars />}
             </button>
           </div>
         </div>
 
-        {/* Navigation */}
-        <nav className="p-4">
-          <ul className="flex flex-col space-y-2">
-            {navItems.map((item) => (
-              <li key={item.href} className="w-full">
-                <Link
-                  href={item.href}
-                  className={`
-                    flex items-center px-3 py-2 rounded-lg transition-all duration-300 w-full
-                    ${pathname === item.href 
-                      ? 'bg-[#6C5DD3] text-white' 
-                      : 'text-gray-400 hover:bg-gray-800'
-                    }
-                    ${!isOpen ? 'justify-center' : ''}
-                  `}
-                >
-                  <span className="min-w-[24px] flex justify-center">{item.icon}</span>
-                  <span 
-                    className={`
-                      ml-3 whitespace-nowrap transition-opacity duration-300
-                      ${isOpen ? 'opacity-100 w-auto' : 'opacity-0 w-0 overflow-hidden'}
-                    `}
-                  >
-                    {item.label}
-                  </span>
-                </Link>
-              </li>
-            ))}
-            
-            {/* Auth Navigation */}
-            <li className="w-full mt-auto">
-              {user ? (
-                <button
-                  onClick={handleLogout}
-                  className={`
-                    flex items-center px-3 py-2 rounded-lg transition-all duration-300 w-full
-                    text-gray-400 hover:bg-gray-800
-                    ${!isOpen ? 'justify-center' : ''}
-                  `}
-                >
-                  <span className="min-w-[24px] flex justify-center">
-                    <FaSignOutAlt />
-                  </span>
-                  <span 
-                    className={`
-                      ml-3 whitespace-nowrap transition-opacity duration-300
-                      ${isOpen ? 'opacity-100 w-auto' : 'opacity-0 w-0 overflow-hidden'}
-                    `}
-                  >
-                    Logout
-                  </span>
-                </button>
-              ) : (
-                <Link
-                  href={`/auth/login?redirectTo=${encodeURIComponent(pathname)}`}
-                  className={`
-                    flex items-center px-3 py-2 rounded-lg transition-all duration-300 w-full
-                    text-gray-400 hover:bg-gray-800
-                    ${!isOpen ? 'justify-center' : ''}
-                  `}
-                >
-                  <span className="min-w-[24px] flex justify-center">
-                    <FaSignInAlt />
-                  </span>
-                  <span 
-                    className={`
-                      ml-3 whitespace-nowrap transition-opacity duration-300
-                      ${isOpen ? 'opacity-100 w-auto' : 'opacity-0 w-0 overflow-hidden'}
-                    `}
-                  >
-                    Login
-                  </span>
-                </Link>
-              )}
-            </li>
-          </ul>
+        {/* Navigation Items */}
+        <nav className="flex-1 py-4">
+          {navItems.map((item, index) => (
+            <Link
+              key={index}
+              href={item.href}
+              onClick={(e) => handleNavClick(e, item.href)}
+              className={`
+                ${commonLinkClasses}
+                ${
+                  pathname === item.href
+                    ? "bg-primary text-primary-content"
+                    : "hover:bg-base-300"
+                }
+              `}
+            >
+              <span className="min-w-[24px] flex justify-center">
+                {item.icon}
+              </span>
+              {isOpen && <span className="ml-3">{item.label}</span>}
+            </Link>
+          ))}
         </nav>
+
+        {/* Auth and Theme Controls */}
+        <div className="p-4 border-t border-gray-800">
+          {user ? (
+            <button
+              onClick={handleLogout}
+              className={`
+                ${commonLinkClasses}
+                hover:bg-base-300
+              `}
+            >
+              <span className="min-w-[24px] flex justify-center">
+                <FaSignOutAlt />
+              </span>
+              {isOpen && <span className="ml-3">Logout</span>}
+            </button>
+          ) : (
+            <button
+              onClick={handleLogin}
+              className={`
+                ${commonLinkClasses}
+                hover:bg-base-300
+              `}
+            >
+              <span className="min-w-[24px] flex justify-center">
+                <FaSignInAlt />
+              </span>
+              {isOpen && <span className="ml-3">Login</span>}
+            </button>
+          )}
+
+          <div className="mt-4 flex justify-center">
+            <ThemeSwitcher />
+          </div>
+        </div>
       </aside>
 
       {/* Mobile Overlay */}
       {isOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-black bg-opacity-50 lg:hidden z-20"
           onClick={onToggle}
         />
       )}
     </>
-  )
-} 
+  );
+}
