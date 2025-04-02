@@ -69,8 +69,9 @@ export function Sidebar({
   };
 
   const commonLinkClasses = `
-    flex items-center px-3 py-2 rounded-lg transition-all duration-300 w-full
-    ${!isOpen ? "justify-center" : ""}
+    flex ${
+      isOpen ? "justify-start" : "justify-center"
+    } px-3 py-2 rounded-lg transition-all duration-300 w-full
   `;
 
   return (
@@ -78,29 +79,27 @@ export function Sidebar({
       <aside
         className={`
           fixed top-0 left-0 h-screen bg-[#1B1E23] border-r border-gray-800
-          transition-all duration-300 ease-in-out z-30 flex flex-col
+          transition-all duration-300 ease-in-out z-30 flex flex-col overflow-hidden
           ${isOpen ? "w-64" : "w-16"}
         `}
       >
         {/* Sidebar Header with Toggle Button */}
-        <div className="h-16 flex items-center px-4 border-b border-gray-800">
-          <div className="flex items-center justify-between w-full">
-            <h1
-              className={`
-                text-xl font-semibold transition-opacity duration-300
-                ${
-                  isOpen
-                    ? "opacity-100 w-auto"
-                    : "opacity-0 w-0 overflow-hidden"
-                }
-              `}
-            >
-              {title}
-            </h1>
-            <button onClick={onToggle} className="btn btn-ghost btn-circle">
-              {isOpen ? <FaTimes /> : <FaBars />}
-            </button>
-          </div>
+        <div
+          className={`h-16 flex items-center ${
+            isOpen ? "justify-between" : "justify-center"
+          } px-4 border-b border-gray-800`}
+        >
+          <h1
+            className={`
+              text-xl font-semibold transition-all duration-300 delay-100
+              ${isOpen ? "opacity-100 flex-1" : "opacity-0 w-0 overflow-hidden"}
+            `}
+          >
+            {title}
+          </h1>
+          <button onClick={onToggle} className="btn btn-ghost btn-circle">
+            {isOpen ? <FaTimes /> : <FaBars />}
+          </button>
         </div>
 
         {/* Navigation Items */}
@@ -119,10 +118,21 @@ export function Sidebar({
                 }
               `}
             >
-              <span className="min-w-[24px] flex justify-center">
-                {item.icon}
-              </span>
-              {isOpen && <span className="ml-3">{item.label}</span>}
+              <div className="flex items-center">
+                <div className="w-6 flex justify-center">{item.icon}</div>
+                <span
+                  className={`
+                    transition-all duration-300 delay-100
+                    ${
+                      isOpen
+                        ? "opacity-100 w-auto ml-3 "
+                        : "opacity-0 w-0 overflow-hidden"
+                    }
+                  `}
+                >
+                  {item.label}
+                </span>
+              </div>
             </Link>
           ))}
         </nav>
@@ -134,26 +144,52 @@ export function Sidebar({
               onClick={handleLogout}
               className={`
                 ${commonLinkClasses}
-                hover:bg-base-300
+                hover:bg-base-300 hover:cursor-pointer text-error
               `}
             >
-              <span className="min-w-[24px] flex justify-center">
-                <FaSignOutAlt />
-              </span>
-              {isOpen && <span className="ml-3">Logout</span>}
+              <div className="flex items-center">
+                <div className="w-6 flex justify-center">
+                  <FaSignOutAlt />
+                </div>
+                <span
+                  className={`
+                    transition-all duration-300 delay-100
+                    ${
+                      isOpen
+                        ? "opacity-100 w-auto ml-3"
+                        : "opacity-0 w-0 overflow-hidden"
+                    }
+                  `}
+                >
+                  Logout
+                </span>
+              </div>
             </button>
           ) : (
             <button
               onClick={handleLogin}
               className={`
                 ${commonLinkClasses}
-                hover:bg-base-300
+                hover:bg-base-300 hover:cursor-pointer
               `}
             >
-              <span className="min-w-[24px] flex justify-center">
-                <FaSignInAlt />
-              </span>
-              {isOpen && <span className="ml-3">Login</span>}
+              <div className="flex items-center">
+                <div className="w-6 flex justify-center">
+                  <FaSignInAlt />
+                </div>
+                <span
+                  className={`
+                    transition-all duration-300 delay-100
+                    ${
+                      isOpen
+                        ? "opacity-100 w-auto ml-3"
+                        : "opacity-0 w-0 overflow-hidden"
+                    }
+                  `}
+                >
+                  Login
+                </span>
+              </div>
             </button>
           )}
 

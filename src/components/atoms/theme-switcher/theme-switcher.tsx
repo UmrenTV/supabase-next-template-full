@@ -6,7 +6,7 @@ type Theme = "winter" | "dracula";
 
 export function ThemeSwitcher() {
   const checkTheme = () => {
-    if (typeof window === "undefined") return "winter";
+    if (typeof window === "undefined") return "dracula";
 
     const localTheme = window.localStorage.getItem("theme") as Theme;
     const prefersDark = window.matchMedia(
