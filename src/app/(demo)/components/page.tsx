@@ -9,10 +9,19 @@ import {
   Textarea,
   Select,
   Radio,
-  Switch
+  Switch,
+  Search
 } from '@/components/atoms'
-import { FormGroup, InputGroup, InputGroupAddon, InputGroupInput } from '@/components/molecules'
-import { LoginForm, SearchBar, Sidebar } from '@/components/organisms'
+import {
+  FormGroup,
+  InputGroup,
+  Card
+} from '@/components/molecules'
+import {
+  Header,
+  LoginForm
+} from '@/components/organisms'
+import { BaseLayout } from '@/components/layouts/base-layout'
 
 export default function ComponentsDemo() {
   const [inputValue, setInputValue] = useState('')
@@ -29,319 +38,205 @@ export default function ComponentsDemo() {
     { value: '3', label: 'Option 3', disabled: true }
   ]
 
-  const sidebarItems = [
-    { label: 'Home', href: '/' },
-    { label: 'Components', href: '/components' },
-    { label: 'Templates', href: '/templates' }
-  ]
+  const mockUser = {
+    name: 'John Doe',
+    email: 'john@example.com',
+    initials: 'JD'
+  }
 
   return (
-    <div className="container mx-auto px-4 py-8">
-      <h1 className="text-3xl font-bold mb-8">Component Library Demo</h1>
-      
-      {/* Sidebar Demo */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-semibold mb-4">Sidebar</h2>
-        <div className="h-64 border rounded-lg overflow-hidden">
-          <Sidebar items={sidebarItems} />
-        </div>
-      </section>
+    <BaseLayout
+      title="Components"
+      headerContent={
+        <Header 
+          user={mockUser}
+          showSearch
+          showNotifications
+        />
+      }
+    >
+      <div className="container mx-auto px-4 py-8 max-w-7xl">
+        <h1 className="text-3xl font-bold mb-8">Component Library Demo</h1>
 
-      {/* Search Bar Demo */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-semibold mb-4">Search Bar</h2>
-        <div className="max-w-md">
-          <SearchBar onSearch={(query) => console.log('Search:', query)} />
-        </div>
-      </section>
-
-      {/* Login Form Demo */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-semibold mb-4">Login Form</h2>
-        <div className="max-w-md">
-          <LoginForm onSubmit={(data) => console.log('Login:', data)} />
-        </div>
-      </section>
-
-      {/* Button Demo */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-semibold mb-4">Buttons</h2>
-        <div className="flex flex-wrap gap-4">
-          <Button label="Primary" variant="primary" />
-          <Button label="Secondary" variant="secondary" />
-          <Button label="Accent" variant="accent" />
-          <Button label="Ghost" variant="ghost" />
-          <Button label="Link" variant="link" />
-          <Button label="Outline" variant="outline" />
-        </div>
-        
-        <div className="mt-4">
-          <h3 className="text-xl font-semibold mb-2">Button Sizes</h3>
-          <div className="flex items-center gap-4">
-            <Button label="Extra Small" size="xs" />
-            <Button label="Small" size="sm" />
-            <Button label="Medium" size="md" />
-            <Button label="Large" size="lg" />
+        {/* Search Bar Demo */}
+        <Card title="Search Bar">
+          <div className="max-w-md mx-auto">
+            <Search onSearch={(query) => console.log('Search:', query)} />
           </div>
-        </div>
+        </Card>
 
-        <div className="mt-4">
-          <h3 className="text-xl font-semibold mb-2">Button States</h3>
-          <div className="flex items-center gap-4">
-            <Button label="Loading" loading />
-            <Button label="Disabled" disabled />
+        {/* Login Form Demo */}
+        <Card title="Login Form" className="mt-8">
+          <div className="max-w-md mx-auto">
+            <LoginForm onSubmit={(data) => console.log('Login:', data)} />
           </div>
-        </div>
-      </section>
+        </Card>
 
-      {/* TextInput Demo */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-semibold mb-4">Text Inputs</h2>
-        <div className="max-w-md space-y-4">
-          <TextInput
-            label="Basic Input"
-            placeholder="Enter text..."
-            value={inputValue}
-            onChange={setInputValue}
-          />
-          <TextInput
-            label="With Error"
-            placeholder="Enter email..."
-            value=""
-            onChange={() => {}}
-            error="Please enter a valid email"
-          />
-          <TextInput
-            label="Disabled Input"
-            placeholder="Disabled..."
-            value=""
-            onChange={() => {}}
-            disabled
-          />
-          <TextInput
-            label="Read Only Input"
-            placeholder="Read only..."
-            value="Cannot edit this"
-            onChange={() => {}}
-            readOnly
-          />
-        </div>
-      </section>
+        {/* Button Demo */}
+        <Card title="Buttons" className="mt-8">
+          <div className="flex flex-wrap gap-4">
+            <Button label="Primary" variant="primary" />
+            <Button label="Secondary" variant="secondary" />
+            <Button label="Accent" variant="accent" />
+            <Button label="Ghost" variant="ghost" />
+            <Button label="Link" variant="link" />
+            <Button label="Outline" variant="outline" />
+          </div>
+          
+          <div className="mt-4">
+            <h3 className="text-xl font-semibold mb-2">Button Sizes</h3>
+            <div className="flex items-center gap-4">
+              <Button label="Extra Small" size="xs" />
+              <Button label="Small" size="sm" />
+              <Button label="Medium" size="md" />
+              <Button label="Large" size="lg" />
+            </div>
+          </div>
 
-      {/* DateTime Demo */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-semibold mb-4">Date & Time Inputs</h2>
-        <div className="max-w-md space-y-4">
-          <DateTime
-            label="Date Input"
-            type="date"
-            value={dateValue}
-            onChange={setDateValue}
-          />
-          <DateTime
-            label="Time Input"
-            type="time"
-            value=""
-            onChange={() => {}}
-          />
-          <DateTime
-            label="DateTime Input"
-            type="datetime-local"
-            value=""
-            onChange={() => {}}
-            error="Please select a valid date and time"
-          />
-          <DateTime
-            label="With Min/Max"
-            type="date"
-            value=""
-            onChange={() => {}}
-            min="2024-01-01"
-            max="2024-12-31"
-          />
-        </div>
-      </section>
+          <div className="mt-4">
+            <h3 className="text-xl font-semibold mb-2">Button States</h3>
+            <div className="flex items-center gap-4">
+              <Button label="Loading" loading />
+              <Button label="Disabled" disabled />
+            </div>
+          </div>
+        </Card>
 
-      {/* Textarea Demo */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-semibold mb-4">Textareas</h2>
-        <div className="max-w-md space-y-4">
-          <Textarea
-            label="Basic Textarea"
-            placeholder="Enter description..."
-            value={textareaValue}
-            onChange={setTextareaValue}
-          />
-          <Textarea
-            label="With Error"
-            placeholder="Enter content..."
-            value=""
-            onChange={() => {}}
-            error="This field is required"
-          />
-          <Textarea
-            label="Disabled Textarea"
-            placeholder="Disabled..."
-            value=""
-            onChange={() => {}}
-            disabled
-          />
-          <Textarea
-            label="Read Only Textarea"
-            placeholder="Read only..."
-            value="Cannot edit this content"
-            onChange={() => {}}
-            readOnly
-          />
-          <Textarea
-            label="Custom Size"
-            placeholder="Custom rows and cols..."
-            value=""
-            onChange={() => {}}
-            rows={5}
-            cols={50}
-          />
-          <Textarea
-            label="Resize Options"
-            placeholder="Try resizing..."
-            value=""
-            onChange={() => {}}
-            resize="vertical"
-          />
-        </div>
-      </section>
+        {/* Form Controls Demo */}
+        <Card title="Form Controls" className="mt-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {/* Text Inputs */}
+            <div className="space-y-4">
+              <h3 className="text-xl font-semibold mb-2">Text Inputs</h3>
+              <TextInput
+                label="Basic Input"
+                placeholder="Enter text..."
+                value={inputValue}
+                onChange={setInputValue}
+              />
+              <TextInput
+                label="With Error"
+                placeholder="Enter email..."
+                value=""
+                onChange={() => {}}
+                error="Please enter a valid email"
+              />
+              <TextInput
+                placeholder="Search..."
+                value=""
+                onChange={() => {}}
+              />
+            </div>
 
-      {/* Select Demo */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-semibold mb-4">Select</h2>
-        <div className="max-w-md space-y-4">
-          <Select
-            label="Basic Select"
-            value={selectValue}
-            onChange={setSelectValue}
-            options={selectOptions}
-          />
-          <Select
-            label="With Error"
-            value=""
-            onChange={() => {}}
-            options={selectOptions}
-            error="Please select an option"
-          />
-          <Select
-            label="Disabled Select"
-            value=""
-            onChange={() => {}}
-            options={selectOptions}
-            disabled
-          />
-        </div>
-      </section>
+            {/* Date & Time */}
+            <div className="space-y-4">
+              <h3 className="text-xl font-semibold mb-2">Date & Time</h3>
+              <DateTime
+                label="Date Input"
+                type="date"
+                value={dateValue}
+                onChange={setDateValue}
+              />
+              <DateTime
+                label="Time Input"
+                type="time"
+                value=""
+                onChange={() => {}}
+              />
+            </div>
 
-      {/* Radio Demo */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-semibold mb-4">Radio Buttons</h2>
-        <div className="space-y-4">
-          <Radio
-            name="radio-group"
-            value="1"
-            checked={radioValue === '1'}
-            onChange={setRadioValue}
-            label="Option 1"
-          />
-          <Radio
-            name="radio-group"
-            value="2"
-            checked={radioValue === '2'}
-            onChange={setRadioValue}
-            label="Option 2"
-          />
-          <Radio
-            name="radio-group"
-            value="3"
-            checked={radioValue === '3'}
-            onChange={setRadioValue}
-            label="Option 3"
-            disabled
-          />
-        </div>
-      </section>
+            {/* Textarea */}
+            <div className="space-y-4">
+              <h3 className="text-xl font-semibold mb-2">Textarea</h3>
+              <Textarea
+                label="Basic Textarea"
+                placeholder="Enter description..."
+                value={textareaValue}
+                onChange={setTextareaValue}
+              />
+            </div>
 
-      {/* Switch Demo */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-semibold mb-4">Switches</h2>
-        <div className="space-y-4">
-          <Switch
-            label="Basic Switch"
-            checked={switchValue}
-            onChange={setSwitchValue}
-          />
-          <Switch
-            label="Disabled Switch"
-            checked={false}
-            onChange={() => {}}
-            disabled
-          />
-        </div>
-      </section>
+            {/* Select */}
+            <div className="space-y-4">
+              <h3 className="text-xl font-semibold mb-2">Select</h3>
+              <Select
+                label="Basic Select"
+                value={selectValue}
+                onChange={setSelectValue}
+                options={selectOptions}
+              />
+            </div>
 
-      {/* Checkbox Demo */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-semibold mb-4">Checkboxes</h2>
-        <div className="space-y-4">
-          <Checkbox
-            label="Basic Checkbox"
-            checked={isChecked}
-            onChange={setIsChecked}
-          />
-          <Checkbox
-            label="With Error"
-            checked={false}
-            onChange={() => {}}
-            error="Please accept the terms"
-          />
-          <Checkbox
-            label="Disabled Checkbox"
-            checked={false}
-            onChange={() => {}}
-            disabled
-          />
-        </div>
-      </section>
+            {/* Radio & Checkbox */}
+            <div className="space-y-4">
+              <h3 className="text-xl font-semibold mb-2">Radio & Checkbox</h3>
+              <div className="space-y-2">
+                <Radio
+                  name="radio-group"
+                  value="1"
+                  checked={radioValue === '1'}
+                  onChange={setRadioValue}
+                  label="Option 1"
+                />
+                <Radio
+                  name="radio-group"
+                  value="2"
+                  checked={radioValue === '2'}
+                  onChange={setRadioValue}
+                  label="Option 2"
+                />
+              </div>
+              <div className="mt-4">
+                <Checkbox
+                  label="Basic Checkbox"
+                  checked={isChecked}
+                  onChange={setIsChecked}
+                />
+              </div>
+            </div>
 
-      {/* FormGroup Demo */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-semibold mb-4">Form Groups</h2>
-        <div className="max-w-md space-y-4">
-          <FormGroup label="Basic Group" required>
-            <TextInput value="" onChange={() => {}} />
-          </FormGroup>
-          <FormGroup label="With Error" error="This field is required">
-            <TextInput value="" onChange={() => {}} />
-          </FormGroup>
-        </div>
-      </section>
+            {/* Switch */}
+            <div className="space-y-4">
+              <h3 className="text-xl font-semibold mb-2">Switch</h3>
+              <Switch
+                label="Basic Switch"
+                checked={switchValue}
+                onChange={setSwitchValue}
+              />
+            </div>
+          </div>
+        </Card>
 
-      {/* InputGroup Demo */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-semibold mb-4">Input Groups</h2>
-        <div className="max-w-md space-y-4">
-          <InputGroup>
-            <InputGroupAddon>@</InputGroupAddon>
-            <InputGroupInput>
-              <TextInput value="" onChange={() => {}} placeholder="Username" />
-            </InputGroupInput>
-          </InputGroup>
-          <InputGroup>
-            <InputGroupInput>
-              <TextInput value="" onChange={() => {}} placeholder="Search..." />
-            </InputGroupInput>
-            <InputGroupAddon>
-              <Button label="Search" variant="primary" />
-            </InputGroupAddon>
-          </InputGroup>
-        </div>
-      </section>
-    </div>
+        {/* Form Groups Demo */}
+        <Card title="Form Groups" className="mt-8">
+          <div className="max-w-md mx-auto space-y-4">
+            <FormGroup label="Basic Group" required>
+              <TextInput value="" onChange={() => {}} />
+            </FormGroup>
+            <FormGroup label="With Error" error="This field is required">
+              <TextInput value="" onChange={() => {}} />
+            </FormGroup>
+          </div>
+        </Card>
+
+        {/* Input Groups Demo */}
+        <Card title="Input Groups" className="mt-8">
+          <div className="max-w-md mx-auto space-y-4">
+            <InputGroup>
+              <div className="input-group">
+                <span className="input-group-text">@</span>
+                <input type="text" placeholder="Username" className="input input-bordered w-full" />
+              </div>
+            </InputGroup>
+            <InputGroup>
+              <div className="input-group">
+                <input type="text" placeholder="Search..." className="input input-bordered w-full" />
+                <button className="btn btn-primary">Search</button>
+              </div>
+            </InputGroup>
+          </div>
+        </Card>
+      </div>
+    </BaseLayout>
   )
 } 

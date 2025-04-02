@@ -1,4 +1,4 @@
-import { Card } from '@/components/molecules'
+import { FeatureCard } from '@/components/molecules/feature-card/feature-card'
 import { Button } from '@/components/atoms'
 
 interface Feature {
@@ -33,12 +33,9 @@ export function FeatureSection({
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
           {features.map((feature, index) => (
-            <Card
+            <FeatureCard
               key={index}
-              title={feature.title}
-              description={feature.description}
-              buttonLabel={feature.buttonLabel}
-              onButtonClick={feature.onButtonClick}
+              {...feature}
             />
           ))}
         </div>

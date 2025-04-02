@@ -14,9 +14,14 @@ export const securitySchema = z.object({
   currentPassword: z.string().min(8, 'Password must be at least 8 characters'),
   newPassword: z.string().min(8, 'Password must be at least 8 characters'),
   confirmPassword: z.string()
-}).refine((data) => data.newPassword === data.confirmPassword, {
-  message: "Passwords don't match",
-  path: ["confirmPassword"],
+}).superRefine(async (data, ctx) => {
+  if (data.newPassword !== data.confirmPassword) {
+    ctx.addIssue({
+      code: z.ZodIssueCode.custom,
+      message: "Passwords don't match",
+      path: ["confirmPassword"]
+    });
+  }
 })
 
 export const notificationSchema = z.object({

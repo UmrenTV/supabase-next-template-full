@@ -2,31 +2,15 @@ import { Button } from '@/components/atoms'
 
 interface CardProps {
   title: string
-  description: string
-  buttonLabel?: string
-  onButtonClick?: () => void
+  children: React.ReactNode
+  className?: string
 }
 
-export function Card({ 
-  title, 
-  description, 
-  buttonLabel, 
-  onButtonClick 
-}: CardProps) {
+export function Card({ title, children, className = '' }: CardProps) {
   return (
-    <div className="card bg-base-100 shadow-xl">
-      <div className="card-body">
-        <h2 className="card-title">{title}</h2>
-        <p>{description}</p>
-        {buttonLabel && (
-          <div className="card-actions justify-end">
-            <Button 
-              label={buttonLabel} 
-              onClick={onButtonClick}
-            />
-          </div>
-        )}
-      </div>
-    </div>
+    <section className={`mb-12 ${className}`}>
+      <h2 className="text-2xl font-semibold mb-4">{title}</h2>
+      {children}
+    </section>
   )
 } 

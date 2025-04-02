@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
         pathname: '/**',
       },
     ],
+    domains: ['placehold.co', 'daisyui.com']
   },
 };
 

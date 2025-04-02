@@ -1,4 +1,4 @@
-export { FeatureSection } from './feature-section/feature-section'
-export { LoginForm } from './login-form/login-form'
-export { SearchBar } from './search-bar/search-bar'
-export { Sidebar } from './sidebar/sidebar' 
+export * from './sidebar/sidebar'
+export * from './header/header'
+export * from './login-form/login-form'
+export * from './search-bar/search-bar' 
