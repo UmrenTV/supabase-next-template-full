@@ -18,3 +18,5 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 
 ## This is multipurpose (for my own needs) template done using Cursor AI.
 I wanted to check what is the hype around Cursor and how it works, so I've built this out of curiousity and to have it as reference for my future ideas (maybe).
+
+### It is not finished, be any means, and it's WIP.
